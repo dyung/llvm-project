@@ -22914,15 +22914,56 @@ SDValue X86TargetLowering::LowerFP_ROUND(SDValue Op, SelectionDAG &DAG) const {
   SDLoc DL(Op);
   SDValue Chain = IsStrict ? Op.getOperand(0) : SDValue();
   SDValue In = Op.getOperand(IsStrict ? 1 : 0);
+  SDValue Op2 = Op.getOperand(IsStrict ? 2 : 1);
   MVT VT = Op.getSimpleValueType();
   MVT SVT = In.getSimpleValueType();
 
   if (SVT == MVT::f128 || (VT == MVT::f16 && SVT == MVT::f80))
     return SDValue();
 
-  if (VT.getScalarType() == MVT::f16 && !Subtarget.hasFP16()) {
-    if (!Subtarget.hasF16C() || SVT.getScalarType() != MVT::f32)
+#if 0
+  if (VT.getScalarType() == MVT::f16 && isTypeLegal(VT)) {
+    if (Subtarget.hasFP16()) {
+      fprintf(stderr, "Exit 1\n");
+      return Op;
+    }
+
+    if (SVT.getScalarType() != MVT::f32) {
+      MVT TmpVT =
+          VT.isVector() ? SVT.changeVectorElementType(MVT::f32) : MVT::f32;
+      if (IsStrict) {
+        fprintf(stderr, "Exit 2\n");
+        return DAG.getNode(
+            ISD::STRICT_FP_ROUND, DL, {VT, MVT::Other},
+            {Chain,
+             DAG.getNode(ISD::STRICT_FP_ROUND, DL, {TmpVT, MVT::Other},
+                         {Chain, In, Op2}),
+             Op2});
+      }
+
+      fprintf(stderr, "Exit 3\n");
+      return DAG.getNode(ISD::FP_ROUND, DL, VT,
+                         DAG.getNode(ISD::FP_ROUND, DL, TmpVT, In, Op2), Op2);
+    }
+
+    if (!Subtarget.hasF16C()) {
+      fprintf(stderr, "Exit 4\n");
       return SDValue();
+    }
+#endif
+#if 1
+  if (VT.getScalarType() == MVT::f16 && !Subtarget.hasFP16()) {
+    if (!Subtarget.hasF16C() || SVT.getScalarType() != MVT::f32) {
+      if (IsStrict) {
+        return SDValue();
+      } else {
+        MVT TmpVT =
+            VT.isVector() ? SVT.changeVectorElementType(MVT::f32) : MVT::f32;
+        return DAG.getNode(ISD::FP_ROUND, DL, VT,
+                           DAG.getNode(ISD::FP_ROUND, DL, TmpVT, In, Op2), Op2);
+      }
+    }
+#endif
 
     if (VT.isVector())
       return Op;
