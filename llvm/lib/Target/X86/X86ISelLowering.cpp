@@ -22951,16 +22951,18 @@ SDValue X86TargetLowering::LowerFP_ROUND(SDValue Op, SelectionDAG &DAG) const {
       return SDValue();
     }
 #endif
-#if 1
+#if 0
   if (VT.getScalarType() == MVT::f16 && !Subtarget.hasFP16()) {
-    if (!Subtarget.hasF16C() || SVT.getScalarType() != MVT::f32) {
-      if (IsStrict) {
+    if (!Subtarget.hasF16C() || SVT.getScalarType() != MVT::f32)
+      return SDValue();
+#endif
+#if 1
+  if (VT.getScalarType() == MVT::f16) {
+    if (Subtarget.hasF16C()) {
+      return Op;
+    } else {
+      if (SVT.getScalarType() != MVT::f32) {
         return SDValue();
-      } else {
-        MVT TmpVT =
-            VT.isVector() ? SVT.changeVectorElementType(MVT::f32) : MVT::f32;
-        return DAG.getNode(ISD::FP_ROUND, DL, VT,
-                           DAG.getNode(ISD::FP_ROUND, DL, TmpVT, In, Op2), Op2);
       }
     }
 #endif
@@ -33005,9 +33007,25 @@ void X86TargetLowering::ReplaceNodeResults(SDNode *N,
     }
     if (!Subtarget.hasFP16() && VT.getVectorElementType() == MVT::f16) {
       assert(Subtarget.hasF16C() && "Cannot widen f16 without F16C");
+#if 1
+      if (SrcVT == MVT::v2f64) {
+        if (IsStrict)
+          Src = DAG.getNode(X86ISD::STRICT_VFPROUND, dl,
+                            {MVT::v4f32, MVT::Other}, {Chain, Src});
+        else
+          Src = DAG.getNode(X86ISD::VFPROUND, dl, MVT::v4f32, Src);
+      } else if (SrcVT == MVT::v4f64) {
+        if (IsStrict)
+          Src = DAG.getNode(ISD::STRICT_FP_ROUND, dl, {MVT::v4f32, MVT::Other},
+                            {Chain, Src, Rnd});
+        else
+          Src = DAG.getNode(ISD::FP_ROUND, dl, MVT::v4f32, Src, Rnd);
+      }
+#endif
+#if 0
       if (SrcVT.getVectorElementType() != MVT::f32)
         return;
-
+#endif
       if (IsStrict)
         V = DAG.getNode(X86ISD::STRICT_CVTPS2PH, dl, {MVT::v8i16, MVT::Other},
                         {Chain, Src, Rnd});
