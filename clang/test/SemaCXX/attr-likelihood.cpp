@@ -1,13 +1,18 @@
 // RUN: %clang_cc1 %s -std=c++17 -fsyntax-only -verify
-// RUN: %clang_cc1 %s -DPEDANTIC -pedantic -fsyntax-only -verify
+// RUN: %clang_cc1 %s -std=c++17 -DPEDANTIC -pedantic -fsyntax-only -verify=expected,cpp17
+// RUN: %clang_cc1 %s -std=c++20 -fsyntax-only -verify
+// RUN: %clang_cc1 %s -std=c++20 -DPEDANTIC -pedantic -fsyntax-only -verify
 
 #if PEDANTIC
 void g() {
   if (true)
-    [[likely]] {} // expected-warning {{use of the 'likely' attribute is a C++20 extension}}
+    [[likely]] {} // cpp17-warning {{use of the 'likely' attribute is a C++20 extension}}
   else
-    [[unlikely]] {} // expected-warning {{use of the 'unlikely' attribute is a C++20 extension}}
+    [[unlikely]] {} // cpp17-warning {{use of the 'unlikely' attribute is a C++20 extension}}
 }
+#if __cplusplus >= 202002L
+  // expected-no-diagnostics
+#endif
 #else
 void a() {
   if (true)

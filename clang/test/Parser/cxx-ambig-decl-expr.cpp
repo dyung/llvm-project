@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++17 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++20 -fsyntax-only -verify=expected,cpp20 %s
 
 struct X {
   template<typename T, typename U>
@@ -25,6 +26,7 @@ void arr() {
   // This is array indexing not an array declarator because a comma expression
   // is not syntactically a constant-expression.
   int(x[1,1]); // expected-warning {{left operand of comma operator has no effect}} expected-warning {{unused}}
+  // cpp20-warning@-1{{top-level comma expression in array subscript is deprecated in C++20 and unsupported in C++23}}
 
   // This is array indexing not an array declaration because a braced-init-list
   // is not syntactically a constant-expression.

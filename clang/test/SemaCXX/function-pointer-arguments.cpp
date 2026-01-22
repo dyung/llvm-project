@@ -1,4 +1,5 @@
-//RUN: %clang_cc1 -fsyntax-only -verify %s
+//RUN: %clang_cc1 -fsyntax-only -verify -std=c++17 %s
+//RUN: %clang_cc1 -fsyntax-only -verify=expected,cpp20 -std=c++20 %s
 
 namespace PR16570 {
   int f1(int, int);
@@ -9,10 +10,10 @@ namespace PR16570 {
   void good() {
     int(*g1)(int, int) = f1;
     int(*g2)(const int, int) = f1;
-    int(*g3)(volatile int, int) = f1;
+    int(*g3)(volatile int, int) = f1; // cpp20-warning {{volatile-qualified parameter type}}
     int(*g4)(int, int) = f2;
     int(*g5)(const int, int) = f2;
-    int(*g6)(volatile int, int) = f2;
+    int(*g6)(volatile int, int) = f2; // cpp20-warning {{volatile-qualified parameter type}}
     int(*g7)(int&, int) = f3;
     int(*g8)(const int&, int) = f4;
   }

@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++17 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++20 -fsyntax-only -verify=expected,cpp20 %s
 
 template<typename T> struct A { };
 
@@ -14,7 +15,7 @@ void test_f0(int i, const int ci) {
 // deduction.
 template<typename T> A<T> f1(T&);
 
-void test_f1(int i, const int ci, volatile int vi) {
+void test_f1(int i, const int ci, volatile int vi) { // cpp20-warning {{volatile-qualified parameter type 'volatile int' is deprecated}}
   A<int> a0 = f1(i);
   A<const int> a1 = f1(ci);
   A<volatile int> a2 = f1(vi);
@@ -44,7 +45,7 @@ void test_g1(A<float> af) {
 //     transformed A.
 template<typename T> A<T> f2(const T&);
 
-void test_f2(int i, const int ci, volatile int vi) {
+void test_f2(int i, const int ci, volatile int vi) { // cpp20-warning {{volatile-qualified parameter type 'volatile int' is deprecated}}
   A<int> a0 = f2(i);
   A<int> a1 = f2(ci);
   A<volatile int> a2 = f2(vi);

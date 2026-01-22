@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++17 -fsyntax-only -verify=expected,pre20 %s
+// RUN: %clang_cc1 -std=c++20 -fsyntax-only -verify %s
 class X;
 
 // C++ [temp.param]p4
@@ -15,7 +16,11 @@ template<int X::*pm> struct A8;
 template<float (X::*pmf)(float, int)> struct A9;
 template<typename T, T x> struct A10;
 
-template<float f> struct A11; // expected-error{{a non-type template parameter cannot have type 'float'}}
+template<float f> struct A11; // pre20-error{{a non-type template parameter cannot have type 'float'}}
 
 template<void *Ptr> struct A12;
 template<int (*IncompleteArrayPtr)[]> struct A13;
+
+#if __cplusplus >= 202002L
+  // expected-no-diagnostics
+#endif

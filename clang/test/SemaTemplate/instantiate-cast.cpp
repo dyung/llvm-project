@@ -1,13 +1,14 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
-// RUN: %clang_cc1 -fsyntax-only -verify -std=c++98 %s
-// RUN: %clang_cc1 -fsyntax-only -verify -std=c++11 %s
+// RUN: %clang_cc1 -fsyntax-only -verify -std=c++20 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,pre20 -std=c++17 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,pre20 -std=c++98 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,pre20 -std=c++11 %s
 
 struct A { int x; };
-// expected-note@-1 {{candidate constructor (the implicit copy constructor) not viable: no known conversion from 'int' to 'const A' for 1st argument}}
+// pre20-note@-1 {{candidate constructor (the implicit copy constructor) not viable: no known conversion from 'int' to 'const A' for 1st argument}}
 #if __cplusplus >= 201103L
-// expected-note@-3 {{candidate constructor (the implicit move constructor) not viable: no known conversion from 'int' to 'A' for 1st argument}}
+// pre20-note@-3 {{candidate constructor (the implicit move constructor) not viable: no known conversion from 'int' to 'A' for 1st argument}}
 #endif
-// expected-note@-5 {{candidate constructor (the implicit default constructor) not viable: requires 0 arguments, but 1 was provided}}
+// pre20-note@-5 {{candidate constructor (the implicit default constructor) not viable: requires 0 arguments, but 1 was provided}}
 
 class Base { 
 public:
@@ -43,13 +44,13 @@ template struct CStyleCast0<A, int>; // expected-note{{instantiation}}
 template<typename T, typename U>
 struct StaticCast0 {
   void f(T t) {
-    (void)static_cast<U>(t); // expected-error{{no matching conversion for static_cast from 'int' to 'A'}}
+    (void)static_cast<U>(t); // pre20-error{{no matching conversion for static_cast from 'int' to 'A'}}
   }
 };
 
 template struct StaticCast0<ConvertibleToInt, bool>;
 template struct StaticCast0<int, float>;
-template struct StaticCast0<int, A>; // expected-note{{instantiation}}
+template struct StaticCast0<int, A>; // pre20-note{{instantiation}}
 
 // ---------------------------------------------------------------------
 // dynamic_cast

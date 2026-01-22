@@ -2305,17 +2305,25 @@
 // AVR:#define __WCHAR_TYPE__ int
 // AVR:#define __WINT_TYPE__ int
 
-// RUN: %clang_cc1 -E -dM -ffreestanding \
+// C++20 mode also defines __CLANG_ATOMIC_CHAR8_T_LOCK_FREE
+// RUN: %clang_cc1 -std=c++17 -E -dM -ffreestanding \
 // RUN:    -triple i686-windows-msvc -fms-compatibility -x c++ < /dev/null \
 // RUN:  | FileCheck -match-full-lines -check-prefix MSVC-X32 %s
+// RUN: %clang_cc1 -std=c++20 -E -dM -ffreestanding \
+// RUN:    -triple i686-windows-msvc -fms-compatibility -x c++ < /dev/null \
+// RUN:  | FileCheck -match-full-lines -check-prefixes=MSVC-X32,MSVC-X32-20 %s
 
-// RUN: %clang_cc1 -E -dM -ffreestanding \
+// RUN: %clang_cc1 -std=c++17 -E -dM -ffreestanding \
 // RUN:    -triple x86_64-windows-msvc -fms-compatibility -x c++ < /dev/null \
 // RUN:  | FileCheck -match-full-lines -check-prefix MSVC-X64 %s
+// RUN: %clang_cc1 -std=c++20 -E -dM -ffreestanding \
+// RUN:    -triple x86_64-windows-msvc -fms-compatibility -x c++ < /dev/null \
+// RUN:  | FileCheck -match-full-lines -check-prefixes=MSVC-X64,MSVC-X64-20 %s
 
 // MSVC-X32:#define __CLANG_ATOMIC_BOOL_LOCK_FREE 2
 // MSVC-X32-NEXT:#define __CLANG_ATOMIC_CHAR16_T_LOCK_FREE 2
 // MSVC-X32-NEXT:#define __CLANG_ATOMIC_CHAR32_T_LOCK_FREE 2
+// MSVC-X32-20-NEXT:#define __CLANG_ATOMIC_CHAR8_T_LOCK_FREE 2
 // MSVC-X32-NEXT:#define __CLANG_ATOMIC_CHAR_LOCK_FREE 2
 // MSVC-X32-NEXT:#define __CLANG_ATOMIC_INT_LOCK_FREE 2
 // MSVC-X32-NEXT:#define __CLANG_ATOMIC_LLONG_LOCK_FREE 2
@@ -2329,6 +2337,7 @@
 // MSVC-X64:#define __CLANG_ATOMIC_BOOL_LOCK_FREE 2
 // MSVC-X64-NEXT:#define __CLANG_ATOMIC_CHAR16_T_LOCK_FREE 2
 // MSVC-X64-NEXT:#define __CLANG_ATOMIC_CHAR32_T_LOCK_FREE 2
+// MSVC-X64-20-NEXT:#define __CLANG_ATOMIC_CHAR8_T_LOCK_FREE 2
 // MSVC-X64-NEXT:#define __CLANG_ATOMIC_CHAR_LOCK_FREE 2
 // MSVC-X64-NEXT:#define __CLANG_ATOMIC_INT_LOCK_FREE 2
 // MSVC-X64-NEXT:#define __CLANG_ATOMIC_LLONG_LOCK_FREE 2

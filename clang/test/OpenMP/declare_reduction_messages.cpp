@@ -1,8 +1,10 @@
-// RUN: %clang_cc1 -verify -fopenmp -ferror-limit 100 %s -Wuninitialized
+// RUN: %clang_cc1 -verify=expected,cpp20 -fopenmp -ferror-limit 100 -std=c++20 %s -Wuninitialized
+// RUN: %clang_cc1 -verify -fopenmp -ferror-limit 100 -std=c++17 %s -Wuninitialized
 // RUN: %clang_cc1 -verify -fopenmp -ferror-limit 100 -std=c++98 %s -Wuninitialized
 // RUN: %clang_cc1 -verify -fopenmp -ferror-limit 100 -std=c++11 %s -Wuninitialized
 
-// RUN: %clang_cc1 -verify -fopenmp-simd -ferror-limit 100 %s -Wuninitialized
+// RUN: %clang_cc1 -verify=expected,cpp20 -fopenmp-simd -ferror-limit 100 -std=c++20 %s -Wuninitialized
+// RUN: %clang_cc1 -verify -fopenmp-simd -ferror-limit 100 -std=c++17 %s -Wuninitialized
 // RUN: %clang_cc1 -verify -fopenmp-simd -ferror-limit 100 -std=c++98 %s -Wuninitialized
 // RUN: %clang_cc1 -verify -fopenmp-simd -ferror-limit 100 -std=c++11 %s -Wuninitialized
 
@@ -21,6 +23,7 @@ int temp; // expected-note 7 {{'temp' declared here}}
 #pragma omp declare reduction(fun : int                                    // expected-error {{expected ':'}} expected-error {{expected expression}}
 #pragma omp declare reduction(+ : const int:                               // expected-error {{reduction type cannot be qualified with 'const', 'volatile' or 'restrict'}}
 #pragma omp declare reduction(- : volatile int:                            // expected-error {{reduction type cannot be qualified with 'const', 'volatile' or 'restrict'}}
+									   // cpp20-warning@-1 {{volatile-qualified parameter type 'volatile int' is deprecated}}
 #pragma omp declare reduction(* : int;                                     // expected-error {{expected ','}} expected-error {{expected a type}}
 #pragma omp declare reduction(& : double char:                             // expected-error {{cannot combine with previous 'double' declaration specifier}} expected-error {{expected expression}}
 #pragma omp declare reduction(^ : double, char, :                          // expected-error {{expected a type}} expected-error {{expected expression}}

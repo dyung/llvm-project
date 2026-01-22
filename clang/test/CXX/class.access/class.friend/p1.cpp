@@ -1,7 +1,8 @@
 // RUN: %clang_cc1 -fsyntax-only -verify -std=c++98 %s
 // RUN: %clang_cc1 -fsyntax-only -verify -std=c++11 %s
 // RUN: %clang_cc1 -fsyntax-only -verify -std=c++14 %s
-// RUN: %clang_cc1 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -fsyntax-only -verify -std=c++17 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,cpp20 -std=c++20 %s
 
 // C++'0x [class.friend] p1:
 //   A friend of a class is a function or class that is given permission to use
@@ -214,7 +215,7 @@ namespace test5 {
 
 // PR6207
 namespace test6 {
-  struct A {};
+  struct A {}; // cpp20-note {{previous declaration is here}}
 
   struct B {
     friend
@@ -226,7 +227,7 @@ namespace test6 {
       noexcept
 #endif
       ;
-    friend A::~A();
+    friend A::~A(); // cpp20-error {{non-constexpr declaration}}
     friend
 #if __cplusplus >= 201402L
       constexpr

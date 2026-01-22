@@ -1,5 +1,7 @@
-// RUN: %clang_cc1 -fms-extensions -fsyntax-only -verify %s -Wno-microsoft
-// RUN: %clang_cc1 -fms-extensions -fdelayed-template-parsing -fsyntax-only -verify %s -Wno-microsoft
+// RUN: %clang_cc1 -std=c++17 -fms-extensions -fsyntax-only -verify %s -Wno-microsoft
+// RUN: %clang_cc1 -std=c++17 -fms-extensions -fdelayed-template-parsing -fsyntax-only -verify %s -Wno-microsoft
+// RUN: %clang_cc1 -std=c++20 -fms-extensions -fsyntax-only -verify=expected,cpp20 %s -Wno-microsoft
+// RUN: %clang_cc1 -std=c++20 -fms-extensions -fdelayed-template-parsing -fsyntax-only -verify=expected,cpp20 %s -Wno-microsoft
 
 class A {
 public:
@@ -9,8 +11,10 @@ public:
 
   template<> struct X<int>; // expected-error {{explicit specialization of 'A::X<int>' after instantiation}}
   template<> struct X<char>; // expected-note {{forward declaration}}
+			     // cpp20-note@-1 {{forward declaration}}
 
   X<char>::x b; // expected-error {{incomplete type 'A::X<char>' named in nested name specifier}}
+		// cpp20-error@-1 {{incomplete type 'A::X<char>' named in nested name specifier}}
 
   template<> struct X<double> {
     typedef int y;

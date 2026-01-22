@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -verify=expected,cxx11 -Wc++11-compat %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,cxx11 -Wc++11-compat %s -std=c++20
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,cxx11,pre20 -Wc++11-compat %s -std=c++17
 // RUN: %clang_cc1 -fsyntax-only -verify=expected,cxx98 -Wc++11-compat %s -std=c++98
 class C {
 public:
@@ -68,8 +69,8 @@ public:
                                             // cxx11-note {{negative shift count -1}}
   static const int overflow_shift4 = 1<<-1; // cxx11-error {{in-class initializer for static data member is not a constant expression}} \
                                             // cxx11-note {{negative shift count -1}}
-  static const int overflow_shift5 = -1<<1; // cxx11-error {{in-class initializer for static data member is not a constant expression}} \
-                                            // cxx11-note {{left shift of negative value -1}}
+  static const int overflow_shift5 = -1<<1; // pre20-error {{in-class initializer for static data member is not a constant expression}} \
+                                            // pre20-note {{left shift of negative value -1}}
 
   void m() {
     sx = 0;

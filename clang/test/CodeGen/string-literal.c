@@ -1,7 +1,10 @@
 // RUN: %clang_cc1 -triple i386-unknown-unknown -emit-llvm %s -o - | FileCheck -check-prefix=CHECK-C %s
-// RUN: %clang_cc1 -x c++ -triple i386-unknown-unknown -emit-llvm %s -o - | FileCheck -check-prefix=CHECK-C %s
-// RUN: %clang_cc1 -x c++ -std=c++11 -triple i386-unknown-unknown -emit-llvm %s -o - | FileCheck -check-prefix=CHECK-CXX11 %s
+// RUN: %clang_cc1 -std=c++17 -x c++ -triple i386-unknown-unknown -emit-llvm %s -o - | FileCheck -check-prefix=CHECK-C %s
+// RUN: %clang_cc1 -std=c++17 -x c++ -std=c++11 -triple i386-unknown-unknown -emit-llvm %s -o - | FileCheck -check-prefix=CHECK-CXX11 %s
 // RUN: %clang_cc1 -x c -std=c11 -triple i386-unknown-unknown -emit-llvm %s -o - | FileCheck -check-prefix=CHECK-C11 %s
+
+// RUN: %clang_cc1 -std=c++20 -x c++ -triple i386-unknown-unknown -emit-llvm %s -o - | FileCheck -check-prefix=CHECK-C %s
+// RUN: %clang_cc1 -std=c++20 -x c++ -std=c++11 -triple i386-unknown-unknown -emit-llvm %s -o - | FileCheck -check-prefix=CHECK-CXX11 %s
 
 #include <stddef.h>
 
@@ -67,14 +70,22 @@ int main(void) {
 
   // CHECK-C11: private unnamed_addr constant [4 x i8] c"def\00", align 1
   // CHECK-CXX11: private unnamed_addr constant [4 x i8] c"def\00", align 1
-  const char *g = u8"def";
+#if __cplusplus < 202002L
+  const char *g = u8"def"; // Invalid in C++20
+#else
+  const char *g = "def";
+#endif
 
 #ifdef __cplusplus
   // CHECK-CXX11: private unnamed_addr constant [4 x i8] c"ghi\00", align 1
   const char *h = R"foo(ghi)foo";
 
   // CHECK-CXX11: private unnamed_addr constant [4 x i8] c"jkl\00", align 1
-  const char *i = u8R"bar(jkl)bar";
+#if __cplusplus < 202002L
+  const char *i = u8R"bar(jkl)bar"; // Invalid in C++20
+#else
+  const char *i = "bar(jkl)bar";
+#endif
 
   // CHECK-CXX11: private unnamed_addr constant [3 x i16] [i16 71, i16 72, i16 0], align 2
   const char16_t *j = uR"foo(GH)foo";
@@ -103,10 +114,17 @@ def)" "ghi";
 def)";
 
   // CHECK-CXX11: private unnamed_addr constant [13 x i8] c"def\\\0A??=\0Aabc\00", align 1
+#if __cplusplus < 202002L
   const char *s = u8R\
 "(def\
 ??=
 abc)";
+#else
+  const char *s = R\
+"(def\
+??=
+abc)";
+#endif
 
   // CHECK-CXX11: private unnamed_addr constant [13 x i16] [i16 97, i16 98, i16 99, i16 92, i16 10, i16 63, i16 63, i16 61, i16 10, i16 100, i16 101, i16 102, i16 0], align 2
   const char16_t *t = uR\
