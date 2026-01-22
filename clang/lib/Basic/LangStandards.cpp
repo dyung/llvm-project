@@ -111,6 +111,7 @@ LangStandard::Kind clang::getDefaultLanguageStandard(clang::Language Lang,
   case Language::ObjC:
     return LangStandard::lang_gnu11;
   case Language::CXX:
+    return LangStandard::lang_gnucxx20;
   case Language::ObjCXX:
   case Language::CUDA:
   case Language::HIP:
