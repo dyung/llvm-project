@@ -1,7 +1,12 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++20 -fsyntax-only -verify=expected,cpp20 %s
+// RUN: %clang_cc1 -std=c++17 -fsyntax-only -verify %s
 
 #define restrict __restrict__
 typedef int* ptr;
+// cpp20-warning@+6{{volatile-qualified parameter type }}
+// cpp20-warning@+4{{volatile-qualified parameter type }}
+// cpp20-warning@+3{{volatile-qualified parameter type }}
+// cpp20-warning@+2{{volatile-qualified parameter type }}
 void test1(ptr p, const ptr cp, restrict ptr rp, const restrict ptr crp,
            volatile ptr vp, const volatile ptr cvp, restrict volatile ptr rvp,
            const restrict volatile ptr crvp) {

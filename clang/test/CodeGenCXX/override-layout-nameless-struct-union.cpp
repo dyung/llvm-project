@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -w -fdump-record-layouts-simple -foverride-record-layout=%S/Inputs/override-layout-nameless-struct-union.layout %s | FileCheck %s
+// This test fails when modules are enabled.
+// RUN: %clang_cc1 -fno-cxx-modules -w -fdump-record-layouts-simple -foverride-record-layout=%S/Inputs/override-layout-nameless-struct-union.layout %s | FileCheck %s
 
 // CHECK: Type: struct S
 // CHECK:   Size:64

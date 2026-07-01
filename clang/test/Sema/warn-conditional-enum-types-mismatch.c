@@ -1,5 +1,6 @@
 // RUN: %clang_cc1 -x c -fsyntax-only -verify -Wenum-compare-conditional %s
-// RUN: %clang_cc1 -x c++ -fsyntax-only -verify -Wenum-compare-conditional %s
+// RUN: %clang_cc1 -x c++ -std=c++17 -fsyntax-only -verify -Wenum-compare-conditional %s
+// RUN: %clang_cc1 -x c++ -std=c++20 -fsyntax-only -verify=expected,cpp20 -Wenum-compare-conditional %s
 
 enum ro { A = 0x10 };
 enum rw { B = 0xFF };
@@ -29,9 +30,9 @@ int get_flag(int cond) {
 // this code pattern is quite sensitive and we dont want to produce so many false positives.
 
 int get_flag_anon_enum(int cond) {
-  return cond ? A : C;
+  return cond ? A : C; // cpp20-warning{{conditional expression between different enumeration types}}
 }
 
 int foo(int c) {
-  return c ? STATUS_SOMETHING_INTERESTING : STATUS_SUCCESS;
+  return c ? STATUS_SOMETHING_INTERESTING : STATUS_SUCCESS; // cpp20-warning{{conditional expression between different enumeration types}}
 }

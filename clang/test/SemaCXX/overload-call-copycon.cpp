@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s -Wnon-pod-varargs
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,cpp20 -std=c++20 %s -Wnon-pod-varargs
+// RUN: %clang_cc1 -fsyntax-only -verify -std=c++17 %s -Wnon-pod-varargs
 // RUN: %clang_cc1 -fsyntax-only -verify -std=c++98 %s -Wnon-pod-varargs
 // RUN: %clang_cc1 -fsyntax-only -verify -std=c++11 %s -Wnon-pod-varargs
 
@@ -11,7 +12,7 @@ class X { }; // expected-note {{the implicit copy constructor}}
 int& copycon(X x); // expected-note{{passing argument to parameter}}
 float& copycon(...);
 
-void test_copycon(X x, X const xc, X volatile xv) {
+void test_copycon(X x, X const xc, X volatile xv) { // cpp20-warning{{volatile-qualified parameter type}}
   int& i1 = copycon(x);
   int& i2 = copycon(xc);
   copycon(xv); // expected-error{{no matching constructor}}
@@ -31,7 +32,7 @@ short& copycon2(A a); // expected-note{{passing argument to parameter}}
 int& copycon2(B b); // expected-note 2{{passing argument to parameter}}
 float& copycon2(...);
 
-void test_copycon2(A a, const A ac, B b, B const bc, B volatile bv) {
+void test_copycon2(A a, const A ac, B b, B const bc, B volatile bv) { // cpp20-warning {{volatile-qualified parameter type}}
   int& i1 = copycon2(b);
   copycon2(bc); // expected-error{{no matching constructor}}
   copycon2(bv); // expected-error{{no matching constructor}}
