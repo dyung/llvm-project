@@ -1,4 +1,5 @@
-// RUN: %clang_analyze_cc1 -analyzer-checker=alpha.webkit.UncheckedLambdaCapturesChecker -verify %s
+// RUN: %clang_analyze_cc1 -std=c++17 -analyzer-checker=alpha.webkit.UncheckedLambdaCapturesChecker -verify %s
+// RUN: %clang_analyze_cc1 -std=c++20 -analyzer-checker=alpha.webkit.UncheckedLambdaCapturesChecker -verify -Wno-ambiguous-reversed-operator %s
 
 #include "mock-types.h"
 

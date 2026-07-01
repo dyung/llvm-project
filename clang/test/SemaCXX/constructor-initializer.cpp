@@ -1,6 +1,7 @@
-// RUN: %clang_cc1 -Wreorder -fsyntax-only -verify %s
-// RUN: %clang_cc1 -Wreorder -fsyntax-only -verify -std=c++98 %s
-// RUN: %clang_cc1 -Wreorder -fsyntax-only -verify -std=c++11 %s
+// RUN: %clang_cc1 -Wreorder -fsyntax-only -verify=expected,cpp20 -std=c++20 %s
+// RUN: %clang_cc1 -Wreorder -fsyntax-only -verify=expected,pre20 -std=c++17 %s
+// RUN: %clang_cc1 -Wreorder -fsyntax-only -verify=expected,pre20 -std=c++98 %s
+// RUN: %clang_cc1 -Wreorder -fsyntax-only -verify=expected,pre20 -std=c++11 %s
 
 class A { 
   int m;
@@ -239,16 +240,17 @@ namespace PR7402 {
 // Don't crash. Lots of questionable recovery here;  errors can change.
 namespace test3 {
   class A : public std::exception {}; // expected-error {{undeclared identifier}} expected-error {{expected class name}}
-  // expected-note@-1 {{candidate constructor (the implicit copy constructor) not viable}}
+  // pre20-note@-1 {{candidate constructor (the implicit copy constructor) not viable}}
 #if __cplusplus >= 201103L // C++11 or later
-  // expected-note@-3 {{candidate constructor (the implicit move constructor) not viable}}
+  // pre20-note@-3 {{candidate constructor (the implicit move constructor) not viable}}
 #endif
-  // expected-note@-5 {{candidate constructor (the implicit default constructor) not viable}}
+  // pre20-note@-5 {{candidate constructor (the implicit default constructor) not viable}}
 
   class B : public A {
   public:
     B(const String& s, int e=0) // expected-error {{unknown type name}} 
-      : A(e), m_String(s) , m_ErrorStr(__null) {} // expected-error {{no matching constructor}} \
+      : A(e), m_String(s) , m_ErrorStr(__null) {} // pre20-error {{no matching constructor}} \
+						  // cpp20-error {{excess elements in struct initializer}} \
       expected-error {{member initializer 'm_String' does not name}} \
       expected-error {{member initializer 'm_ErrorStr' does not name}}
     B(const B& e)

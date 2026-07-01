@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,cpp20 -std=c++20 %s
+// RUN: %clang_cc1 -fsyntax-only -verify -std=c++17 %s
 // RUN: %clang_cc1 -fsyntax-only -verify -std=c++98 %s
 // RUN: %clang_cc1 -fsyntax-only -verify -std=c++11 %s
 
@@ -45,6 +46,8 @@ struct ConvertibleToInt {
   operator int();
 };
 
+// cpp20-warning@+2 {{volatile-qualified return type 'const volatile Derived'}}
+// cpp20-warning@+1 {{volatile-qualified return type 'const volatile Base'}}
 template<typename T> T create();
 
 // First bullet: lvalue references binding to lvalues (the simple cases).
@@ -64,6 +67,11 @@ void bind_lvalue_to_lvalue(Base b, Derived d,
   long &lr = i; // expected-error{{non-const lvalue reference to type 'long' cannot bind to a value of unrelated type 'int'}}
 }
 
+// cpp20-warning@+7 {{volatile-qualified parameter type 'const volatile int' is deprecated}}
+// cpp20-warning@+5 {{volatile-qualified parameter type 'const volatile Derived' is deprecated}}
+// cpp20-warning@+4 {{volatile-qualified parameter type 'const volatile Base' is deprecated}}
+// cpp20-warning@+2 {{volatile-qualified parameter type 'volatile Derived' is deprecated}}
+// cpp20-warning@+1 {{volatile-qualified parameter type 'volatile Base' is deprecated}}
 void bind_lvalue_quals(volatile Base b, volatile Derived d,
                        volatile const Base bvc, volatile const Derived dvc,
                        volatile const int ivc) {
@@ -123,7 +131,9 @@ void bind_const_lvalue_to_rvalue() {
   const Base &br3 = create<const Base>();
   const Base &br4 = create<const Derived>();
 
+  // cpp20-note@+1 {{while substituting deduced template arguments into}} SUNIL: Why this is not needed on our master ?
   const Base &br5 = create<const volatile Base>();    // expected-error{{binding reference of type 'const Base' to value of type 'const volatile Base' drops 'volatile' qualifier}}
+  // cpp20-note@+1 {{while substituting deduced template arguments into}} SUNIL: Why this is not needed on our master ?
   const Base &br6 = create<const volatile Derived>(); // expected-error{{binding reference of type 'const Base' to value of type 'const volatile Derived' drops 'volatile' qualifier}}
 
   const int &ir = create<int>();

@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++17 -fsyntax-only -verify %s
+// This test crashes with -std=c++20 or -std=gnu++20
 
 // C++20 [temp.class.spec] 13.7.5/10
 //   The usual access checking rules do not apply to non-dependent names

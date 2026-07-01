@@ -1,6 +1,8 @@
-// RUN: %clang_cc1 -fexperimental-new-constant-interpreter -verify=expected,both            %s
+// This test is testing variable length arrays which are implemented in -std=c++20
+// and -std=gnu++17 modes but not in -std=c++17 mode.
+// RUN: %clang_cc1 -fexperimental-new-constant-interpreter -verify=expected,both -std=gnu++17 %s
 // RUN: %clang_cc1 -fexperimental-new-constant-interpreter -verify=expected,both -std=c++20 %s
-// RUN: %clang_cc1 -verify=ref,both            %s
+// RUN: %clang_cc1 -verify=ref,both -std=gnu++17 %s
 // RUN: %clang_cc1 -verify=ref,both -std=c++20 %s
 
 constexpr int m = 3;

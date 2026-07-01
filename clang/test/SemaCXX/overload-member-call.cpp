@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -fsyntax-only -verify -std=c++17 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,cpp20 -std=c++20 %s
 
 struct X {
   int& f(int) const; // expected-note 2 {{candidate function}}
@@ -36,7 +37,7 @@ struct X {
   }
 };
 
-void test(X x, const X xc, X* xp, const X* xcp, volatile X xv, volatile X* xvp) {
+void test(X x, const X xc, X* xp, const X* xcp, volatile X xv, volatile X* xvp) { //cpp20-warning {{volatile-qualified parameter type}}
   int& i1 = xc.f(0);
   int& i2 = xcp->f(0);
   float& f1 = x.f(0);

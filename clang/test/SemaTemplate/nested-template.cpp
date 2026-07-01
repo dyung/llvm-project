@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++17 -fsyntax-only -verify=expected,pre20 %s
+// RUN: %clang_cc1 -std=c++20 -fsyntax-only -verify %s
 class A;
 
 class S {
@@ -112,7 +113,7 @@ template struct X1<int>::B<bool>;
 // Template template parameters
 template<typename T>
 struct X2 {
-  template<template<class U, T Value> class>  // expected-error {{cannot have type 'float'}}
+  template<template<class U, T Value> class>  // pre20-error {{cannot have type 'float'}}
                                               // expected-error@-1 {{cannot be narrowed from type 'long long' to 'int'}}
                                               // expected-note@-2 {{previous template template parameter is here}}
     struct Inner { };
@@ -122,7 +123,7 @@ template<typename T, int Value>
   struct X2_arg;
 
 X2<int>::Inner<X2_arg> x2i1;
-X2<float> x2a; // expected-note{{instantiation}}
+X2<float> x2a; // pre20-note{{instantiation}}
 X2<long long>::Inner<X2_arg> x2i3; // expected-note {{has different template parameters}}
 
 namespace PR10896 {

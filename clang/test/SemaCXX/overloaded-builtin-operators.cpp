@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -fshow-overloads=best -verify -triple x86_64-linux-gnu %s
+// RUN: %clang_cc1 -fsyntax-only -fshow-overloads=best -verify=expected,cpp20 -triple x86_64-linux-gnu -std=c++20 %s
+// RUN: %clang_cc1 -fsyntax-only -fshow-overloads=best -verify -triple x86_64-linux-gnu -std=c++17 %s
 // RUN: %clang_cc1 -fsyntax-only -fshow-overloads=best -verify -triple x86_64-linux-gnu -std=c++98 %s
 // RUN: %clang_cc1 -fsyntax-only -fshow-overloads=best -verify -triple x86_64-linux-gnu -std=c++11 %s
 
@@ -97,7 +98,7 @@ void g(BoolRef br, ShortRef sr, LongRef lr, FloatRef fr, E2Ref e2_ref, XpmfRef p
   short s1 = sr++;
 
   // C++ [over.built]p4
-  long l1 = lr--;
+  long l1 = lr--; // cpp20-warning{{decrement of object of volatile-qualified type 'volatile long'}}
 
   // C++ [over.built]p4
   float f1 = fr--;

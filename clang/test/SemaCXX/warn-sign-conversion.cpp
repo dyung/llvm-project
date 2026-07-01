@@ -1,9 +1,9 @@
-// RUN: %clang_cc1 -triple %itanium_abi_triple -verify -fsyntax-only -Wsign-conversion %s
-
+// RUN: %clang_cc1 -std=c++17 -triple %itanium_abi_triple -verify -fsyntax-only -Wsign-conversion %s
+// RUN: %clang_cc1 -std=c++20 -triple %itanium_abi_triple -verify=expected,cpp20 -fsyntax-only -Wsign-conversion %s
 // NOTE: When a 'enumeral mismatch' warning is implemented then expect several
 // of the following cases to be impacted.
 
-// namespace for unnamed enums tests
+// namespace for unnamed enums tests. Caution: The test contains hardcoded line numbers
 namespace test1 {
   enum { A };
   enum { B = -1 };
@@ -30,18 +30,26 @@ namespace test1 {
     int d2a = 1 ? Foo<bool>::D : i; // expected-warning {{operand of ? changes signedness: 'test1::Foo<bool>::(unnamed enum at }}
     int d2b = 1 ? Foo<bool>::D : i; // expected-warning {{warn-sign-conversion.cpp:13:5)' to 'int'}}
     int d3a = 1 ? B : Foo<bool>::D; // expected-warning {{operand of ? changes signedness: 'test1::Foo<bool>::(unnamed enum at }}
+				    // cpp20-warning@-1 {{conditional expression between different enumeration types}}
     int d3b = 1 ? B : Foo<bool>::D; // expected-warning {{warn-sign-conversion.cpp:13:5)' to 'int'}}
+				    // cpp20-warning@-1 {{conditional expression between different enumeration types}}
     int d4a = 1 ? Foo<bool>::D : B; // expected-warning {{operand of ? changes signedness: 'test1::Foo<bool>::(unnamed enum at }}
+				    // cpp20-warning@-1 {{conditional expression between different enumeration types}}
     int d4b = 1 ? Foo<bool>::D : B; // expected-warning {{warn-sign-conversion.cpp:13:5)' to 'int'}}
+				    // cpp20-warning@-1 {{conditional expression between different enumeration types}}
 
     int e1a = 1 ? i : E; // expected-warning {{operand of ? changes signedness: 'test1::(unnamed enum at }}
     int e1b = 1 ? i : E; // expected-warning {{warn-sign-conversion.cpp:16:3)' to 'int'}}
     int e2a = 1 ? E : i; // expected-warning {{operand of ? changes signedness: 'test1::(unnamed enum at }}
     int e2b = 1 ? E : i; // expected-warning {{warn-sign-conversion.cpp:16:3)' to 'int'}}
     int e3a = 1 ? E : B; // expected-warning {{operand of ? changes signedness: 'test1::(unnamed enum at }}
+				    // cpp20-warning@-1 {{conditional expression between different enumeration types}}
     int e3b = 1 ? E : B; // expected-warning {{warn-sign-conversion.cpp:16:3)' to 'int'}}
+				    // cpp20-warning@-1 {{conditional expression between different enumeration types}}
     int e4a = 1 ? B : E; // expected-warning {{operand of ? changes signedness: 'test1::(unnamed enum at }}
+				    // cpp20-warning@-1 {{conditional expression between different enumeration types}}
     int e4b = 1 ? B : E; // expected-warning {{warn-sign-conversion.cpp:16:3)' to 'int'}}
+				    // cpp20-warning@-1 {{conditional expression between different enumeration types}}
   }
 }
 
@@ -70,11 +78,15 @@ namespace test2 {
     int d1 = 1 ? i : Foo<bool>::D; // expected-warning {{operand of ? changes signedness: 'test2::Foo<bool>::Named4' to 'int'}}
     int d2 = 1 ? Foo<bool>::D : i; // expected-warning {{operand of ? changes signedness: 'test2::Foo<bool>::Named4' to 'int'}}
     int d3 = 1 ? B : Foo<bool>::D; // expected-warning {{operand of ? changes signedness: 'test2::Foo<bool>::Named4' to 'int'}}
+				    // cpp20-warning@-1 {{conditional expression between different enumeration types}}
     int d4 = 1 ? Foo<bool>::D : B; // expected-warning {{operand of ? changes signedness: 'test2::Foo<bool>::Named4' to 'int'}}
+				    // cpp20-warning@-1 {{conditional expression between different enumeration types}}
 
     int e1 = 1 ? i : E; // expected-warning {{operand of ? changes signedness: 'test2::Named5' to 'int'}}
     int e2 = 1 ? E : i; // expected-warning {{operand of ? changes signedness: 'test2::Named5' to 'int'}}
     int e3 = 1 ? E : B; // expected-warning {{operand of ? changes signedness: 'test2::Named5' to 'int'}}
+				    // cpp20-warning@-1 {{conditional expression between different enumeration types}}
     int e4 = 1 ? B : E; // expected-warning {{operand of ? changes signedness: 'test2::Named5' to 'int'}}
+				    // cpp20-warning@-1 {{conditional expression between different enumeration types}}
   }
 }

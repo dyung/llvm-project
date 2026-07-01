@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -triple x86_64-gnu-linux -fsanitize=array-bounds,enum,float-cast-overflow,integer-divide-by-zero,implicit-unsigned-integer-truncation,implicit-signed-integer-truncation,implicit-integer-sign-change,unsigned-integer-overflow,signed-integer-overflow,shift-base,shift-exponent -O3 -disable-llvm-passes -emit-llvm -o - %s | FileCheck %s
+// RUN: %clang_cc1 -std=c++17 -triple x86_64-gnu-linux -fsanitize=array-bounds,enum,float-cast-overflow,integer-divide-by-zero,implicit-unsigned-integer-truncation,implicit-signed-integer-truncation,implicit-integer-sign-change,unsigned-integer-overflow,signed-integer-overflow,shift-base,shift-exponent -O3 -disable-llvm-passes -emit-llvm -o - %s | FileCheck %s --check-prefix=CHECK,PRE20
+// RUN: %clang_cc1 -std=c++20 -triple x86_64-gnu-linux -fsanitize=array-bounds,enum,float-cast-overflow,integer-divide-by-zero,implicit-unsigned-integer-truncation,implicit-signed-integer-truncation,implicit-integer-sign-change,unsigned-integer-overflow,signed-integer-overflow,shift-base,shift-exponent -O3 -disable-llvm-passes -emit-llvm -o - %s | FileCheck %s --check-prefix=CHECK
 
 
 // CHECK: define{{.*}} void @_Z6BoundsRA10_KiDB15_
@@ -193,12 +194,12 @@ void Shifts(_BitInt(9) E) {
   // CHECK: %[[LOADED:.+]] = trunc i16 %[[RHSE]] to i9
   // CHECK: %[[CMP:.+]] = icmp ule i9 %[[LOADED]], 8
   // CHECK: br i1 %[[CMP]]
-  // CHECK: %[[ZEROS:.+]] = sub nuw nsw i9 8, %[[LOADED]]
-  // CHECK: %[[CHECK:.+]] = lshr i9 %[[LOADEDL]], %[[ZEROS]]
-  // CHECK: %[[SKIPSIGN:.+]] = lshr i9 %[[CHECK]], 1
-  // CHECK: %[[CHECK:.+]] = icmp eq i9 %[[SKIPSIGN]]
-  // CHECK: %[[PHI:.+]] = phi i1 [ true, %{{.+}} ], [ %[[CHECK]], %{{.+}} ]
-  // CHECK: and i1 %[[CMP]], %[[PHI]]
+  // PRE20: %[[ZEROS:.+]] = sub nuw nsw i9 8, %[[LOADED]]
+  // PRE20: %[[CHECKVAR:.+]] = lshr i9 %[[LOADEDL]], %[[ZEROS]]
+  // PRE20: %[[SKIPSIGN:.+]] = lshr i9 %[[CHECKVAR]], 1
+  // PRE20: %[[CHECKVAR:.+]] = icmp eq i9 %[[SKIPSIGN]]
+  // PRE20: %[[PHI:.+]] = phi i1 [ true, %{{.+}} ], [ %[[CHECKVAR]], %{{.+}} ]
+  // PRE20: and i1 %[[CMP]], %[[PHI]]
   // CHECK: call void @__ubsan_handle_shift_out_of_bounds_abort
 }
 

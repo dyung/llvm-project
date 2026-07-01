@@ -1,6 +1,7 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
-// RUN: %clang_cc1 -fsyntax-only -verify -std=c++98 %s
-// RUN: %clang_cc1 -fsyntax-only -verify -std=c++11 %s
+// RUN: %clang_cc1 -fsyntax-only -verify -std=c++20 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,pre20 -std=c++17 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,pre20 -std=c++98 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,pre20 -std=c++11 %s
 
 // PR3990
 namespace N {
@@ -36,15 +37,15 @@ struct A {
 
   static int n;
   static type m;
-  static int h(T::type, int); // expected-warning{{missing 'typename'}}
-  static int h(T::type x, char); // expected-warning{{missing 'typename'}}
+  static int h(T::type, int); // pre20-warning{{missing 'typename'}}
+  static int h(T::type x, char); // pre20-warning{{missing 'typename'}}
 };
 
 template<typename T>
-A<T>::type g(T t) { return t; } // expected-warning{{missing 'typename'}}
+A<T>::type g(T t) { return t; } // pre20-warning{{missing 'typename'}}
 
 template<typename T>
-A<T>::type A<T>::f() { return type(); } // expected-warning{{missing 'typename'}}
+A<T>::type A<T>::f() { return type(); } // pre20-warning{{missing 'typename'}}
 
 template<typename T>
 void f(T::type) { } // expected-error{{missing 'typename'}}
@@ -84,11 +85,11 @@ int *test(UnknownType *fool) { return 0; } // expected-error{{unknown type name 
 
 template<typename T> int A<T>::n(T::value); // ok
 template<typename T>
-A<T>::type // expected-warning {{missing 'typename'}}
+A<T>::type // pre20-warning {{missing 'typename'}}
 A<T>::m(T::value, 0); // ok
 
-template<typename T> int A<T>::h(T::type, int) {} // expected-warning{{missing 'typename'}}
-template<typename T> int A<T>::h(T::type x, char) {} // expected-warning{{missing 'typename'}}
+template<typename T> int A<T>::h(T::type, int) {} // pre20-warning{{missing 'typename'}}
+template<typename T> int A<T>::h(T::type x, char) {} // pre20-warning{{missing 'typename'}}
 
 template<typename T> int h(T::type, int); // expected-error{{missing 'typename'}}
 template<typename T> int h(T::type x, char); // expected-error{{missing 'typename'}}
@@ -117,4 +118,4 @@ template<typename T> int i(T::type, int());
 //        a fix-it to add 'typename A<T>::type'
 template<typename T>
 A<T>::g() { } // expected-error{{expected unqualified-id}}
-// expected-warning@-1{{missing 'typename'}}
+// pre20-warning@-1{{missing 'typename'}}

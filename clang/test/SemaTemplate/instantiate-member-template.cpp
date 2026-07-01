@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++17 -fsyntax-only -verify=expected,pre20 %s
+// RUN: %clang_cc1 -std=c++20 -fsyntax-only -verify %s
 
 template<typename T>
 struct X0 {
@@ -110,12 +111,12 @@ struct X2 {
   template<T *Ptr> // expected-error{{pointer to a reference}}
   struct Inner;
   
-  template<T Value> // expected-error{{cannot have type 'float'}}
+  template<T Value> // pre20-error{{cannot have type 'float'}}
   struct Inner2;
 };
 
 X2<int&> x2a; // expected-note{{instantiation}}
-X2<float> x2b; // expected-note{{instantiation}}
+X2<float> x2b; // pre20-note{{instantiation}}
 
 namespace N0 {
   template<typename T>

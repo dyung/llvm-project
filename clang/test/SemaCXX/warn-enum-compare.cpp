@@ -1,5 +1,7 @@
-// RUN: %clang_cc1 %s -fsyntax-only -verify -triple %itanium_abi_triple
-// RUN: %clang_cc1 %s -fsyntax-only -verify -triple %ms_abi_triple -DMSABI
+// RUN: %clang_cc1 %s -std=c++17 -fsyntax-only -verify -triple %itanium_abi_triple
+// RUN: %clang_cc1 %s -std=c++17 -fsyntax-only -verify -triple %ms_abi_triple -DMSABI
+// RUN: %clang_cc1 %s -std=c++20 -fsyntax-only -verify=expected,cpp20 -triple %itanium_abi_triple
+// RUN: %clang_cc1 %s -std=c++20 -fsyntax-only -verify=expected,cpp20 -triple %ms_abi_triple -DMSABI
 
 enum Foo { FooA, FooB, FooC };
 enum Bar { BarD, BarE, BarF };
@@ -45,11 +47,13 @@ void test () {
   while (B2 == name2::B1);
 #ifndef MSABI
   while (x == AnonAA); // expected-warning {{comparison of constant 'AnonAA' (42) with expression of type 'Foo' is always false}}
+		       // cpp20-warning@-1 {{comparison of different enumeration types}}
   while (AnonBB == y); // expected-warning {{comparison of constant 'AnonBB' (45) with expression of type 'Bar' is always false}}
+		       // cpp20-warning@-1 {{comparison of different enumeration types}}
 #endif
   while (AnonAA == AnonAB);
-  while (AnonAB == AnonBA);
-  while (AnonBB == AnonAA);
+  while (AnonAB == AnonBA); // cpp20-warning {{comparison of different enumeration types}}
+  while (AnonBB == AnonAA); // cpp20-warning {{comparison of different enumeration types}}
 
   while ((x) == FooA);
   while ((y) == BarD);
@@ -71,9 +75,10 @@ void test () {
   while ((((((B1))))) == (((name1::B2))));
   while (B2 == ((((((name2::B1)))))));
 
-  while (td == Anon1);
+  while (td == Anon1); // cpp20-warning {{comparison of different enumeration types}}
 #ifndef MSABI
   while (td == AnonAA);  // expected-warning {{comparison of constant 'AnonAA' (42) with expression of type 'TD' is always false}}
+		         // cpp20-warning@-1 {{comparison of different enumeration types}}
 #endif
 
   while (B1 == B2); // expected-warning  {{comparison of different enumeration types ('name1::Baz' and 'name2::Baz')}}

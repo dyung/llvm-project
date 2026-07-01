@@ -1,5 +1,6 @@
 // RUN: %clang_cc1 -x c -fsyntax-only -verify -Wenum-compare -Wno-unused-comparison %s
-// RUN: %clang_cc1 -x c++ -fsyntax-only -verify -Wenum-compare -Wno-unused-comparison %s
+// RUN: %clang_cc1 -x c++ -std=c++17 -fsyntax-only -verify -Wenum-compare -Wno-unused-comparison %s
+// RUN: %clang_cc1 -x c++ -std=c++20 -fsyntax-only -verify=expected,cpp20 -Wenum-compare -Wno-unused-comparison %s
 
 // In C enumerators (i.e enumeration constants) have type int (until C23). In
 // order to support diagnostics such as -Wenum-compare we pretend they have the
@@ -45,7 +46,7 @@ void foo(void) {
   // expected-warning@-1 {{comparison of different enumeration types}}
 
   // In the following cases we purposefully differ from GCC and dont warn 
-  a == C; 
-  A < C;
-  b >= C; 
+  a == C; // cpp20-warning {{comparison of different enumeration types}}
+  A < C; // cpp20-warning {{comparison of different enumeration types}}
+  b >= C; // cpp20-warning {{comparison of different enumeration types}}
 }
