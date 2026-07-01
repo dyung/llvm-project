@@ -1,6 +1,7 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
-// RUN: %clang_cc1 -fsyntax-only -verify -std=c++98 %s
-// RUN: %clang_cc1 -fsyntax-only -verify -std=c++11 %s
+// RUN: %clang_cc1 -fsyntax-only -verify -std=c++20 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,pre20 -std=c++17 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,pre20 -std=c++98 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,pre20 -std=c++11 %s
 
 // C++03 [namespace.udecl]p4:
 //   A using-declaration used as a member-declaration shall refer to a
@@ -26,7 +27,7 @@ namespace test0 {
     using NonClass::type; // expected-error {{not a class}}
     using NonClass::hiding; // expected-error {{not a class}}
     using NonClass::union_member; // expected-error {{not a class}}
-    using NonClass::enumerator; // expected-error {{not a class}}
+    using NonClass::enumerator; // pre20-error {{not a class}}
   };
 }
 

@@ -3,7 +3,10 @@
 // RUN: %clang_cc1 -fopenmp -x c++ -std=c++11 -triple x86_64-apple-darwin10 -emit-pch -o %t %s
 // RUN: %clang_cc1 -fopenmp -x c++ -triple x86_64-apple-darwin10 -std=c++11 -include-pch %t -verify -Wno-vla %s -emit-llvm -o - | FileCheck %s --check-prefix=CHECK1
 // RUN: %clang_cc1 -verify -Wno-vla -fopenmp -x c++ -std=c++11 -DLAMBDA -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck %s --check-prefix=CHECK3
-// RUN: %clang_cc1 -verify -Wno-vla -fopenmp -x c++ -fblocks -DBLOCKS -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck %s --check-prefix=CHECK4
+
+// RUN: %clang_cc1 -std=c++17 -verify -Wno-vla -fopenmp -x c++ -fblocks -DBLOCKS -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck %s --check-prefix=CHECK4
+// RUN: %clang_cc1 -std=c++20 -DDIAGOK -verify=expected,cpp20 -Wno-vla -fopenmp -x c++ -fblocks -DBLOCKS -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck %s --check-prefix=CHECK4
+
 // RUN: %clang_cc1 -verify -Wno-vla -fopenmp -x c++ -std=c++11 -DARRAY -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck %s --check-prefix=CHECK5
 // RUN: %clang_cc1 -verify -Wno-vla -fopenmp -x c++ -std=c++11 -DLOOP -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck %s --check-prefix=CHECK6
 
@@ -11,10 +14,16 @@
 // RUN: %clang_cc1 -fopenmp-simd -x c++ -std=c++11 -triple x86_64-apple-darwin10 -emit-pch -o %t %s
 // RUN: %clang_cc1 -fopenmp-simd -x c++ -triple x86_64-apple-darwin10 -std=c++11 -include-pch %t -verify -Wno-vla %s -emit-llvm -o - | FileCheck %s --check-prefix=CHECK7
 // RUN: %clang_cc1 -verify -Wno-vla -fopenmp-simd -x c++ -std=c++11 -DLAMBDA -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck %s --check-prefix=CHECK9
-// RUN: %clang_cc1 -verify -Wno-vla -fopenmp-simd -x c++ -fblocks -DBLOCKS -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck %s --check-prefix=CHECK10
+
+// RUN: %clang_cc1 -std=c++17 -verify -Wno-vla -fopenmp-simd -x c++ -fblocks -DBLOCKS -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck %s --check-prefix=CHECK10
+// RUN: %clang_cc1 -std=c++20 -DDIAGOK -verify=expected,cpp20 -Wno-vla -fopenmp-simd -x c++ -fblocks -DBLOCKS -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck %s --check-prefix=CHECK10
+
 // RUN: %clang_cc1 -verify -Wno-vla -fopenmp-simd -x c++ -std=c++11 -DARRAY -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck %s --check-prefix=CHECK11
 // RUN: %clang_cc1 -verify -Wno-vla -fopenmp-simd -x c++ -std=c++11 -DLOOP -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck %s --check-prefix=CHECK12
+
+#ifndef DIAGOK
 // expected-no-diagnostics
+#endif
 
 #if !defined(ARRAY) && !defined(LOOP)
 #ifndef HEADER
@@ -67,7 +76,7 @@ int main() {
   return 0;
 #elif defined(BLOCKS)
   ^{
-#pragma omp parallel master taskloop simd lastprivate(g, sivar)
+#pragma omp parallel master taskloop simd lastprivate(g, sivar) // cpp20-warning{{use of result of assignment to object of volatile-qualified}}
   for (int i = 0; i < 10; ++i) {
 
     g = 1;

@@ -1,4 +1,7 @@
 // RUN: %clang_cc1 -triple x86_64-unknown-unknown -fopenmp -verify -emit-llvm -o - %s | FileCheck %s
+
+// RxxxUN: %clang_cc1 -std=c++17 -triple x86_64-unknown-unknown -fopenmp -verify -emit-llvm %s       | FileCheck %s -check-prefix=CHECK,CHECK17
+// RxxxUN: %clang_cc1 -std=c++20 -triple x86_64-unknown-unknown -fopenmp -verify -emit-llvm %s       | FileCheck %s -check-prefix=CHECK,CHECK20
 // expected-no-diagnostics
 
 // Our very own std::move, copied from libcxx.

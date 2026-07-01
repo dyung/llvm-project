@@ -1,4 +1,4 @@
-// RUN: %clang_cc1 -triple i686-windows-msvc -w -fdump-record-layouts-simple -foverride-record-layout=%S/Inputs/override-layout-packed-base.layout %s | FileCheck %s
+// RUN: %clang_cc1 -fno-cxx-modules -triple i686-windows-msvc -w -fdump-record-layouts-simple -foverride-record-layout=%S/Inputs/override-layout-packed-base.layout %s | FileCheck %s
 
 //#pragma pack(push, 1)
 

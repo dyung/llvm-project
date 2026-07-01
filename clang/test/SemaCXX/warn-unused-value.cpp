@@ -1,4 +1,4 @@
-// RUN: %clang_cc1 -fsyntax-only -verify -Wunused-value %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,cpp20 -Wunused-value -std=c++20 %s
 // RUN: %clang_cc1 -fsyntax-only -verify -Wunused-value -std=c++98 %s
 // RUN: %clang_cc1 -fsyntax-only -verify -Wunused-value -std=c++11 %s
 // RUN: %clang_cc1 -fsyntax-only -verify -Wunused-value -std=c++17 %s
@@ -25,6 +25,8 @@ namespace test0 {
 namespace test1 {
 struct Foo {
   int i;
+  // cpp20-note@+2{{ambiguity is between a regular call}}
+  // cpp20-note@+1{{mark 'operator==' as const or add a matching}}
   bool operator==(const Foo& rhs) {
     return i == rhs.i;
   }
@@ -33,6 +35,7 @@ struct Foo {
 #define NOP(x) (x)
 void b(Foo f1, Foo f2) {
   NOP(f1 == f2);  // expected-warning {{expression result unused}}
+		  // cpp20-warning@-1 {{ISO C++20 considers use of overloaded operator}}
 }
 #undef NOP
 }
