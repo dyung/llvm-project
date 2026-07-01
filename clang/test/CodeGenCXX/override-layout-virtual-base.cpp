@@ -1,5 +1,6 @@
-// RUN: %clang_cc1 -w -triple=x86_64-pc-win32 -fms-compatibility -fdump-record-layouts-simple -foverride-record-layout=%S/Inputs/override-layout-virtual-base.layout %s | FileCheck --check-prefix=SIMPLE  %s
-// RUN: %clang_cc1 -w -triple=x86_64-pc-win32 -fms-compatibility -fdump-record-layouts -foverride-record-layout=%S/Inputs/override-layout-virtual-base.layout %s | FileCheck %s
+// This test fails if C++ modules are enabled.
+// RUN: %clang_cc1 -fno-cxx-modules -w -triple=x86_64-pc-win32 -fms-compatibility -fdump-record-layouts-simple -foverride-record-layout=%S/Inputs/override-layout-virtual-base.layout %s | FileCheck --check-prefix=SIMPLE  %s
+// RUN: %clang_cc1 -fno-cxx-modules -w -triple=x86_64-pc-win32 -fms-compatibility -fdump-record-layouts -foverride-record-layout=%S/Inputs/override-layout-virtual-base.layout %s | FileCheck %s
 
 struct S1 {
   int a;

@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -verify -Wno-constant-conversion %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,cpp20 -Wno-constant-conversion -std=c++20 %s
+// RUN: %clang_cc1 -fsyntax-only -verify -Wno-constant-conversion -std=c++17 %s
 // RUN: %clang_cc1 -fsyntax-only -verify -Wno-constant-conversion -std=c++98 %s
 // RUN: %clang_cc1 -fsyntax-only -verify -Wno-constant-conversion -std=c++11 %s
 
@@ -27,14 +28,14 @@ namespace test1 {
 
   void test_ints() {
     volatile int x;
-    bar(x = 5);
+    bar(x = 5); // cpp20-warning {{use of result of assignment to object of volatile-qualified type 'volatile int' is deprecated}}
     bar(x += 5);
   }
 
   enum E { E_zero };
   void test_enums() {
     volatile E x;
-    bar(x = E_zero);
+    bar(x = E_zero);  // cpp20-warning {{use of result of assignment to object of volatile-qualified type}}
     bar(x += E_zero); // expected-error {{incompatible type}}
   }
 }

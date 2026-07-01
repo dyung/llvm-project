@@ -2,7 +2,10 @@
 // RUN: %clang_cc1 -fopenmp -x c++ -std=c++11 -triple x86_64-apple-darwin10 -emit-pch -o %t %s
 // RUN: %clang_cc1 -fopenmp -x c++ -triple x86_64-apple-darwin10 -std=c++11 -include-pch %t -verify -Wno-vla %s -emit-llvm -o - | FileCheck %s
 // RUN: %clang_cc1 -verify -Wno-vla -fopenmp -x c++ -std=c++11 -DLAMBDA -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck -check-prefix=LAMBDA %s
-// RUN: %clang_cc1 -verify -Wno-vla -fopenmp -x c++ -fblocks -DBLOCKS -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck -check-prefix=BLOCKS %s
+
+// RUN: %clang_cc1 -std=c++17 -verify -Wno-vla -fopenmp -x c++ -fblocks -DBLOCKS -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck -check-prefix=BLOCKS %s
+// RUN: %clang_cc1 -std=c++20 -DDIAGOK -verify=expected,cpp20 -Wno-vla -fopenmp -x c++ -fblocks -DBLOCKS -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck -check-prefix=BLOCKS %s
+
 // RUN: %clang_cc1 -verify -Wno-vla -fopenmp -x c++ -std=c++11 -DARRAY -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck -check-prefix=ARRAY %s
 // RUN: %clang_cc1 -verify -Wno-vla -fopenmp -x c++ -std=c++11 -DLOOP -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck -check-prefix=LOOP %s
 
@@ -10,11 +13,17 @@
 // RUN: %clang_cc1 -fopenmp-simd -x c++ -std=c++11 -triple x86_64-apple-darwin10 -emit-pch -o %t %s
 // RUN: %clang_cc1 -fopenmp-simd -x c++ -triple x86_64-apple-darwin10 -std=c++11 -include-pch %t -verify -Wno-vla %s -emit-llvm -o - | FileCheck --check-prefix SIMD-ONLY0 %s
 // RUN: %clang_cc1 -verify -Wno-vla -fopenmp-simd -x c++ -std=c++11 -DLAMBDA -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck --check-prefix SIMD-ONLY0 %s
-// RUN: %clang_cc1 -verify -Wno-vla -fopenmp-simd -x c++ -fblocks -DBLOCKS -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck --check-prefix SIMD-ONLY0 %s
+
+// RUN: %clang_cc1 -std=c++17 -verify -Wno-vla -fopenmp-simd -x c++ -fblocks -DBLOCKS -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck --check-prefix SIMD-ONLY0 %s
+// RUN: %clang_cc1 -std=c++20 -DDIAGOK -verify=expected,cpp20 -Wno-vla -fopenmp-simd -x c++ -fblocks -DBLOCKS -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck --check-prefix SIMD-ONLY0 %s
+
 // RUN: %clang_cc1 -verify -Wno-vla -fopenmp-simd -x c++ -std=c++11 -DARRAY -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck --check-prefix SIMD-ONLY0 %s
 // RUN: %clang_cc1 -verify -Wno-vla -fopenmp-simd -x c++ -std=c++11 -DLOOP -triple x86_64-apple-darwin10 -emit-llvm %s -o - | FileCheck -check-prefix=SIMD-ONLY0 %s
 // SIMD-ONLY0-NOT: {{__kmpc|__tgt}}
+
+#ifndef DIAGOK
 // expected-no-diagnostics
+#endif
 
 #if !defined(ARRAY) && !defined(LOOP)
 #ifndef HEADER
@@ -112,7 +121,7 @@ int main() {
   // BLOCKS: [[PRIVATES:%.+]] = getelementptr inbounds nuw %{{.+}}, ptr %{{.+}}, i{{.+}} 0, i{{.+}} 1
   // BLOCKS: call void @__kmpc_taskloop(ptr @{{.+}}, i32 %{{.+}}, ptr [[RES]], i32 1, ptr %{{.+}}, ptr %{{.+}}, i64 %{{.+}}, i32 1, i32 0, i64 0, ptr [[MAIN_DUP:@.+]])
   // BLOCKS: ret
-#pragma omp master taskloop lastprivate(g, sivar)
+#pragma omp master taskloop lastprivate(g, sivar) // cpp20-warning{{use of result of assignment to object of}}
   for (int i = 0; i < 10; ++i) {
     // BLOCKS: define {{.+}} void {{@.+}}(ptr
     // BLOCKS-NOT: [[G]]{{[[^:word:]]}}

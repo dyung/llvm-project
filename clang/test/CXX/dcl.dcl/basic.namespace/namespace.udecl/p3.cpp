@@ -1,6 +1,7 @@
-// RUN: %clang_cc1 -std=c++98 -fsyntax-only -verify %s
-// RUN: %clang_cc1 -std=c++11 -fsyntax-only -verify %s
-// RUN: %clang_cc1 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++98 -fsyntax-only -verify=expected,pre20 %s
+// RUN: %clang_cc1 -std=c++11 -fsyntax-only -verify=expected,pre20 %s
+// RUN: %clang_cc1 -std=c++17 -fsyntax-only -verify=expected,pre20 %s
+// RUN: %clang_cc1 -std=c++20 -fsyntax-only -verify %s
 
 struct B {
   void f(char);
@@ -32,11 +33,11 @@ class D2 : public B {
 
   using D::f2; // expected-error {{using declaration refers into 'D', which is not a base class of 'D2'}}
   using D::E2; // expected-error {{using declaration refers into 'D', which is not a base class of 'D2'}}
-  using D::e2; // expected-error {{using declaration refers into 'D', which is not a base class of 'D2'}}
+  using D::e2; // pre20-error {{using declaration refers into 'D', which is not a base class of 'D2'}}
   using D::x2; // expected-error {{using declaration refers into 'D', which is not a base class of 'D2'}}
 
   using B::EC;
-  using B::EC::ec; // expected-warning {{a C++20 extension}} expected-warning 0-1 {{C++11}}
+  using B::EC::ec; // pre20-warning {{a C++20 extension}} expected-warning 0-1 {{C++11}}
 };
 
 namespace test1 {

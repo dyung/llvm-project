@@ -1,4 +1,5 @@
-// RUN: %clang_analyze_cc1 -analyzer-checker=webkit.UncountedLambdaCapturesChecker -verify %s
+// RUN: %clang_analyze_cc1 -std=c++17 -analyzer-checker=webkit.UncountedLambdaCapturesChecker -verify %s
+// RUN: %clang_analyze_cc1 -std=c++20 -analyzer-checker=webkit.UncountedLambdaCapturesChecker -verify=expected,cpp20 %s
 
 #include "mock-types.h"
 
@@ -13,7 +14,7 @@ namespace ranges {
 
 template<typename IteratorType, typename CallbackType>
 void for_each(IteratorType first, IteratorType last, CallbackType callback) {
-  for (auto it = first; !(it == last); ++it)
+  for (auto it = first; !(it == last); ++it) // cpp20-warning {{ISO C++20 considers use of overloaded operator '=='}}
     callback(*it);
 }
 
@@ -542,7 +543,8 @@ public:
   Iterator(void* array, unsigned long sizeOfElement, unsigned int index);
   Iterator(const Iterator&);
   Iterator& operator=(const Iterator&);
-  bool operator==(const Iterator&);
+  // cpp20-note@+1 {{ambiguity is between a regular call to this operator and a}}
+  bool operator==(const Iterator&); // cpp20-note{{mark 'operator==' as const or add a matching}}
 
   Iterator& operator++();
   int& operator*();
@@ -554,7 +556,7 @@ private:
 
 void ranges_for_each(RefCountable* obj) {
   int array[] = { 1, 2, 3, 4, 5 };
-  std::ranges::for_each(Iterator(array, sizeof(*array), 0), Iterator(array, sizeof(*array), 5), [&](int& item) {
+  std::ranges::for_each(Iterator(array, sizeof(*array), 0), Iterator(array, sizeof(*array), 5), [&](int& item) { // cpp20-note {{in instantiation of function}}
     obj->method();
     ++item;
   });

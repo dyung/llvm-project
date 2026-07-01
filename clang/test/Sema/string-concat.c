@@ -1,6 +1,7 @@
 
 // RUN: %clang_cc1 -x c -Wstring-concatenation -fsyntax-only -verify %s
-// RUN: %clang_cc1 -x c++ -Wstring-concatenation -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++17 -x c++ -Wstring-concatenation -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++20 -x c++ -Wstring-concatenation -fsyntax-only -verify %s
 
 const char *missing_comma[] = {
     "basic_filebuf",
@@ -23,12 +24,19 @@ const wchar_t *missing_comma_wchar[] = {
     L"shared_future"
 };
 
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L && __cplusplus < 202002L // C++11 to C++17 diagnostics
 const char *missing_comma_u8[] = {
     u8"basic_filebuf",
     u8"packaged_task" // expected-note{{place parentheses around the string literal to silence warning}}
     u8"promise",      // expected-warning{{suspicious concatenation of string literals in an array initialization; did you mean to separate the elements with a comma?}}
     u8"shared_future"
+};
+#elif __cplusplus >= 202002L
+const char *missing_comma_u8[] = {
+    u8"basic_filebuf", // expected-error {{cannot initialize an array element of type 'const char *' with an lvalue of type 'const char8_t[14]'}}
+    u8"packaged_task" // expected-error {{cannot initialize an array element of type 'const char *' with an lvalue of type 'const char8_t[21]'}}
+    u8"promise",
+    u8"shared_future" // expected-error {{cannot initialize an array element of type 'const char *' with an lvalue of type 'const char8_t[14]'}}
 };
 #endif
 

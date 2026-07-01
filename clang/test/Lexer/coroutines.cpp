@@ -1,4 +1,4 @@
-// RUN: %clang_cc1 -fsyntax-only %s
+// RUN: %clang_cc1 -std=c++17 -fsyntax-only %s
 // RUN: %clang_cc1 -std=c++20 -DCORO -fsyntax-only %s
 
 #ifdef CORO

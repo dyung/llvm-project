@@ -1,6 +1,7 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
-// RUN: %clang_cc1 -fsyntax-only -verify -std=c++98 %s
-// RUN: %clang_cc1 -fsyntax-only -verify -std=c++11 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,pre20 -std=c++17 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,pre20 -std=c++98 %s
+// RUN: %clang_cc1 -fsyntax-only -verify=expected,pre20 -std=c++11 %s
+// RUN: %clang_cc1 -fsyntax-only -verify -std=c++20 %s
 
 // This is just the test for [namespace.udecl]p4 with 'using'
 // uniformly stripped out.
@@ -47,7 +48,7 @@ namespace test0 {
     // expected-error@-4 {{ISO C++11 does not allow access declarations; use using declarations instead}}
 #endif
 
-    NonClass::enumerator; // expected-error {{not a class}}
+    NonClass::enumerator; // pre20-error {{not a class}}
 #if __cplusplus <= 199711L
     // expected-warning@-2 {{access declarations are deprecated; use using declarations instead}}
 #else

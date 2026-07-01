@@ -1,4 +1,5 @@
-// RUN: %clang_cc1 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -std=c++17 -fsyntax-only -verify=expected,pre20 %s
+// RUN: %clang_cc1 -std=c++20 -fsyntax-only -verify=expected,cpp20 %s
 template<template<typename T> class MetaFun, typename Value>
 struct apply {
   typedef typename MetaFun<Value>::type type;
@@ -20,16 +21,19 @@ apply<add_reference, int>::type ir = i;
 apply<add_reference, float>::type fr = i; // expected-error{{non-const lvalue reference to type 'float' cannot bind to a value of unrelated type 'int'}}
 
 // Template template parameters
-template<int> struct B;
+template<int> struct B; // cpp20-note {{template parameter is}}
 
 template<typename T,
-         template<T Value> class X> // expected-error{{cannot have type 'float'}}
+         template<T Value> class X> // pre20-error{{cannot have type 'float'}}
                                     // expected-error@-1 {{cannot be narrowed from type 'long long' to 'int'}}
                                     // expected-note@-2 {{previous template template parameter is here}}
+				    // cpp20-error@-3 {{conversion from 'float' to 'int'}}
+                                    // cpp20-note@-4 {{previous template template parameter is here}}
 struct X0 { };
 
 X0<int, B> x0b1;
-X0<float, B> x0b2; // expected-note{{while substituting}}
+X0<float, B> x0b2; // pre20-note{{while substituting}}
+		   // cpp20-note@-1{{template template argument has different template parameters than its}}
 X0<long long, B> x0b3; // expected-note {{has different template parameters}}
 
 template<template<int V> class TT>
