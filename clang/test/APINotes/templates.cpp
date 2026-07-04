@@ -12,15 +12,15 @@
 
 // CHECK-BOX: Dumping Box:
 // CHECK-BOX17-NEXT: ClassTemplateDecl {{.+}} imported in Templates referenced Box
-// CHECK-BOX20-NEXT: ClassTemplateDecl {{.+}} imported in Templates hidden Box
+// CHECK-BOX20-NEXT: ClassTemplateDecl {{.+}} imported in Templates hidden referenced Box
 // CHECK-BOX: SwiftAttrAttr {{.+}} <<invalid sloc>> "import_owned"
 
 // Make sure the attributes aren't duplicated.
 // CHECK-BOX-NOT: SwiftAttrAttr {{.+}} <<invalid sloc>> "import_owned"
 
 // CHECK-MOVEONLY: Dumping MoveOnly:
-// CHECK-MOVEONLY20-NEXT: ClassTemplateDecl {{.+}} imported in Templates hidden MoveOnly
-// CHECK-MOVEONLY17-NEXT: ClassTemplateDecl {{.+}} imported in Templates MoveOnly
+// CHECK-MOVEONLY17-NEXT: ClassTemplateDecl {{.+}} imported in Templates referenced MoveOnly
+// CHECK-MOVEONLY20-NEXT: ClassTemplateDecl {{.+}} imported in Templates hidden referenced MoveOnly
 // CHECK-MOVEONLY: SwiftAttrAttr {{.+}} <<invalid sloc>> "~Copyable"
 
 // Make sure the attributes aren't duplicated.
