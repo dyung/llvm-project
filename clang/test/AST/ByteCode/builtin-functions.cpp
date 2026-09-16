@@ -1,8 +1,8 @@
-// RUN: %clang_cc1 -Wno-string-plus-int -Wno-stringop-overread -fexperimental-new-constant-interpreter -triple x86_64 %s -verify=expected,both
-// RUN: %clang_cc1 -Wno-string-plus-int -Wno-stringop-overread                                         -triple x86_64 %s -verify=ref,both
+// RUN: %clang_cc1 -std=c++17 -Wno-string-plus-int -Wno-stringop-overread -fexperimental-new-constant-interpreter -triple x86_64 %s -verify=expected,both
+// RUN: %clang_cc1 -std=c++17 -Wno-string-plus-int -Wno-stringop-overread                                         -triple x86_64 %s -verify=ref,both
 //
-// RUN: %clang_cc1 -Wno-string-plus-int -Wno-stringop-overread -fexperimental-new-constant-interpreter -triple i686 %s -verify=expected,both
-// RUN: %clang_cc1 -Wno-string-plus-int -Wno-stringop-overread                                         -triple i686 %s -verify=ref,both
+// RUN: %clang_cc1 -std=c++17 -Wno-string-plus-int -Wno-stringop-overread -fexperimental-new-constant-interpreter -triple i686 %s -verify=expected,both
+// RUN: %clang_cc1 -std=c++17 -Wno-string-plus-int -Wno-stringop-overread                                         -triple i686 %s -verify=ref,both
 //
 // RUN: %clang_cc1 -std=c++20 -Wno-string-plus-int -Wno-stringop-overread -fexperimental-new-constant-interpreter -triple x86_64 %s -verify=expected,both
 // RUN: %clang_cc1 -std=c++20 -Wno-string-plus-int -Wno-stringop-overread                                         -triple x86_64 %s -verify=ref,both
@@ -350,11 +350,9 @@ namespace isfpclass {
   int foo() {
     int a = 1; // #decla
     char A[__builtin_isfpclass(1.0f, a)];
-#if __cplusplus >= 202002L
-                                          // both-warning@-2 {{variable length arrays}} \
-                                          // both-note@-2 {{read of non-const variable 'a'}} \
+                                          // both-warning@-1 {{variable length arrays}} \
+                                          // both-note@-1 {{read of non-const variable 'a'}} \
                                           // both-note@#decla {{declared here}}
-#endif
   }
 
   constexpr float a = 1.0f;
