@@ -27,3 +27,47 @@ struct Derived : AlignedBase {
 void use_structs() {
   Derived d;
 }
+
+/*
+17.txt:
+*** Dumping AST Record Layout
+Type: struct AlignedBase
+
+Layout: <ASTRecordLayout
+  Size:64
+  Alignment:64
+  BaseOffsets: []>
+  VBaseOffsets: []>
+  FieldOffsets: []>
+
+*** Dumping AST Record Layout
+Type: struct Derived
+
+Layout: <ASTRecordLayout
+  Size:64
+  Alignment:64
+  BaseOffsets: [0]>
+  VBaseOffsets: []>
+  FieldOffsets: []>
+*/
+/* 20.txt:
+*** Dumping AST Record Layout
+Type: struct AlignedBase
+
+Layout: <ASTRecordLayout
+  Size:8
+  Alignment:8
+  BaseOffsets: []>
+  VBaseOffsets: []>
+  FieldOffsets: []>
+
+*** Dumping AST Record Layout
+Type: struct Derived
+
+Layout: <ASTRecordLayout
+  Size:8
+  Alignment:8
+  BaseOffsets: [0]>
+  VBaseOffsets: []>
+  FieldOffsets: []>
+*/
