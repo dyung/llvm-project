@@ -1,5 +1,5 @@
 // RUN: %clang_cc1 %s -emit-llvm -triple s390x-none-zos -std=c++17 -fexec-charset IBM-1047 -o - | FileCheck %s
-// RUN: %clang_cc1 %s -emit-llvm -triple s390x-none-zos -fexec-charset UTF-8 -o - | FileCheck %s --check-prefix=CHECK-UTF8
+// RUN: %clang_cc1 %s -emit-llvm -triple s390x-none-zos -std=c++17 -fexec-charset UTF-8 -o - | FileCheck %s --check-prefix=CHECK-UTF8
 
 const char *RawString = R"(Hello\n)";
 //CHECK: c"\C8\85\93\93\96\E0\95\00"
