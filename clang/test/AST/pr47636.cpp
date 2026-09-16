@@ -8,8 +8,8 @@ int(&&intu_rvref)[] {1,2,3,4};
 // CHECK17-NEXT: MaterializeTemporaryExpr {{.*}} 'int[4]' xvalue extended by Var 0x[[GLOB_ADDR]] 'intu_rvref' 'int (&&)[4]'
 
 // CHECK20-NEXT: ExprWithCleanups {{.*}} 'int[]' xvalue
-// CHECK20-NEXT: MaterializeTemporaryExpr {{.*}} 'int[]' xvalue extended by Var 0x[[GLOB_ADDR]] 'intu_rvref' 'int (&&)[4]'
-// CHECK20-NEXT: ImplicitCastExpr {{.*}} 'int[]' <NoOp>
+// CHECK20-NEXT: ImplicitCastExpr {{.*}} 'int[]' xvalue <NoOp>
+// CHECK20-NEXT: MaterializeTemporaryExpr {{.*}} 'int[4]' xvalue extended by Var 0x[[GLOB_ADDR]] 'intu_rvref' 'int (&&)[4]'
 
 // CHECK-NEXT: InitListExpr {{.*}} 'int[4]'
 
@@ -22,8 +22,8 @@ void static_const() {
   // CHECK17-NEXT: MaterializeTemporaryExpr {{.*}} 'const int[4]' xvalue extended by Var 0x[[STATIC_ADDR]] 'intu_rvref' 'const int (&&)[4]'
 
   // CHECK20-NEXT: ExprWithCleanups {{.*}} 'const int[]' xvalue
-  // CHECK20-NEXT: MaterializeTemporaryExpr {{.*}} 'const int[]' xvalue extended by Var 0x[[STATIC_ADDR]] 'intu_rvref' 'const int (&&)[4]'
-  // CHECK20-NEXT: ImplicitCastExpr {{.*}} 'const int[]' <NoOp>
+  // CHECK20-NEXT: ImplicitCastExpr {{.*}} 'const int[]' xvalue <NoOp>
+  // CHECK20-NEXT: MaterializeTemporaryExpr {{.*}} 'const int[4]' xvalue extended by Var 0x[[STATIC_ADDR]] 'intu_rvref' 'const int (&&)[4]'
 
   // CHECK-NEXT: InitListExpr {{.*}} 'const int[4]'
 }
@@ -37,9 +37,9 @@ constexpr int const_expr() {
   // CHECK17-NEXT: MaterializeTemporaryExpr {{.*}} 'int[4]' xvalue extended by Var 0x[[CE_ADDR]] 'intu_rvref' 'int (&&)[4]'
 
   // CHECK20-NEXT: ExprWithCleanups {{.*}} 'int[]' xvalue
-  // CHECK20-NEXT: MaterializeTemporaryExpr {{.*}} 'int[]' xvalue extended by Var 0x[[CE_ADDR]] 'intu_rvref' 'int (&&)[4]'
-  // CHECK20-NEXT: ImplicitCastExpr {{.*}} 'int[]' <NoOp>
-
+  // CHECK20-NEXT: ImplicitCastExpr {{.*}} 'int[]' xvalue <NoOp>
+  // CHECK20-NEXT: MaterializeTemporaryExpr {{.*}} 'int[4]' xvalue extended by Var 0x[[CE_ADDR]] 'intu_rvref' 'int (&&)[4]'
+  
   // CHECK-NEXT: InitListExpr {{.*}} 'int[4]'
   return intu_rvref[0];
 }
